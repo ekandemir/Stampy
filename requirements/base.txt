@@ -1,0 +1,41 @@
+# Django updated Nov 2017
+django==2.1.1
+
+# Configuration
+django-environ==0.4.0
+whitenoise==3.2
+
+# Forms
+django-braces==1.9.0
+django-crispy-forms==1.6.0
+django-floppyforms==1.6.2
+
+# Models
+django-model-utils==2.5
+
+# Images
+Pillow==5.0.0
+
+# For user registration, either via email or social
+# Well-built with regular release cycles!
+django-allauth==0.36.0
+django-rest-auth[with_social]==0.9.3
+
+# Unicode slugification
+unicode-slugify==0.1.3
+django-autoslug==1.9.3
+
+# Time zones support
+pytz==2016.6.1
+
+django_compressor==2.0
+
+# Redis support
+django-redis==4.9.0
+redis==2.10.6
+
+# Python-PostgreSQL Database Adapter
+psycopg2==2.8.3
+
+# Rest-Cors
+django-cors-headers==3.0.2
