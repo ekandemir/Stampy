@@ -39,3 +39,7 @@ psycopg2==2.8.3
 
 # Rest-Cors
 django-cors-headers==3.0.2
+
+# Rest-Framework
+djangorestframework==3.10.3
+
