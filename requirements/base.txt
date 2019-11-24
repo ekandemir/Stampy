@@ -42,4 +42,3 @@ django-cors-headers==3.0.2
 
 # Rest-Framework
 djangorestframework==3.10.3
-
