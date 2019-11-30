@@ -29,7 +29,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         password2 = self.validated_data['password2']
 
 
-        if account.phone > "5000000000" and account.phone < "5999999999":
+        if int(account.phone) < 5000000000 or int(account.phone) > 5999999999:
             raise serializers.ValidationError({"name": "Phone is not proper."})
 
         if password != password2:
