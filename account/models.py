@@ -14,10 +14,10 @@ class MyAccountManager(BaseUserManager):
             phone = phone,
         )
         user.set_password(password)
-        user.save(using = self._db)
+        user.save(user = self._db)
         return user
     def create_superuser(self,email, phone, password):
-        user = self.create_user(
+        user = self.model(
             email=self.normalize_email(email),
             phone=phone,
             password = password

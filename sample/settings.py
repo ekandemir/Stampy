@@ -32,8 +32,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'account',
-
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,10 +40,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
-
+    'catalog',
+    'api',
+    'account',
 ]
 
-
+AUTH_USER_MODEL = 'account.Account'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -74,7 +74,7 @@ TEMPLATES = [
         },
     },
 ]
-AUTH_USER_MODEL = 'account.Account'
+
 WSGI_APPLICATION = 'sample.wsgi.application'
 
 # Database
