@@ -39,10 +39,15 @@ class MyAccountManager(BaseUserManager):
         user.set_password(password)
         user.save(using = self._db)
         return user
-    def create_superuser(self,email, password):
+    def create_superuser(self,email, phone, name, surname, dob, gender, password=None):
         user = self.create_user(
             email=self.normalize_email(email),
-            password = password
+            password = password,
+            phone=phone,
+            name=name,
+            surname=surname,
+            dob=dob,
+            gender=gender,
         )
         user.is_admin = True
         user.is_staff = True
@@ -56,19 +61,21 @@ class MyAccountManager(BaseUserManager):
 
 class Account(AbstractBaseUser):
 
-    email = models.EmailField(verbose_name='email', max_length=60, unique=True)
-    phone = models.CharField(verbose_name='phone', max_length=60, unique=True)
-    name = models.CharField(verbose_name='name', max_length=60, default='name')
-    surname = models.CharField(verbose_name='surname', max_length=60, default='surname')
-    dob = models.DateField(verbose_name= 'dob',default=datetime.date(1997, 10, 19))
-    gender = models.CharField(verbose_name='gender', max_length=1, default='N')
-    is_admin = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    is_superuser = models.BooleanField(default=False)
+    email               = models.EmailField(verbose_name='email', max_length=60, unique=True)
+    phone               = models.CharField(verbose_name='phone', max_length=60, unique=True)
+    name                = models.CharField(verbose_name='name', max_length=60, default='name')
+    surname             = models.CharField(verbose_name='surname', max_length=60, default='surname')
+    dob                 = models.DateField(verbose_name= 'dob',default=datetime.date(1997, 10, 19))
+    gender              = models.CharField(verbose_name='gender', max_length=1, default='N')
+    date_joined         = models.DateTimeField(verbose_name='date_joined', default=datetime.datetime.now())
+    last_login          = models.DateTimeField(verbose_name='last_login', default=datetime.datetime.now())
+    is_admin            = models.BooleanField(default=False)
+    is_active           = models.BooleanField(default=True)
+    is_staff            = models.BooleanField(default=False)
+    is_superuser        = models.BooleanField(default=False)
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['phone', 'name', 'surname', 'dob', 'gender']
+    USERNAME_FIELD      = 'email'
+    REQUIRED_FIELDS     = ['phone', 'name', 'surname', 'dob', 'gender']
 
     objects = MyAccountManager()
 

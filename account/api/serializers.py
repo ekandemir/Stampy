@@ -37,3 +37,9 @@ class RegistrationSerializer(serializers.ModelSerializer):
         account.set_password(password)
         account.save()
         return account
+
+class ChangePasswordSerializer(serializers.Serializer):
+
+	old_password 				= serializers.CharField(style={'input_type':'password'},required=True)
+	new_password 				= serializers.CharField(style={'input_type':'password'},required=True)
+	confirm_new_password 		= serializers.CharField(style={'input_type':'password'},required=True)

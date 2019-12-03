@@ -1,8 +1,9 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-
-from account.api.serializers import RegistrationSerializer
+from django.contrib.auth import logout,login
+from django.contrib import messages
+from account.api.serializers import RegistrationSerializer,ChangePasswordSerializer
 from rest_framework.authtoken.models import Token
 
 
@@ -19,6 +20,19 @@ def registration_view(request):
             data['phone'] = account.phone
             token = Token.objects.get(user=account).key
             data['token'] = token
+            login(request,account)
         else:
             data = serializer.errors
         return Response(data)
+
+
+
+@api_view(['POST'])
+def logout_view(request):
+    request.user.auth_token.delete()
+
+
+    logout(request)
+
+    return Response({"success": ("Successfully logged out.")},
+                    status=status.HTTP_200_OK)
