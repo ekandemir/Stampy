@@ -10,9 +10,6 @@ from rest_framework.authtoken.models import Token
 # Create your models here.
 
 
-
-
-
 class MyAccountManager(BaseUserManager):
     def create_user(self, email, phone, name, surname, dob, gender, password=None):
         if not email:
@@ -57,8 +54,6 @@ class MyAccountManager(BaseUserManager):
         return user
 
 
-
-
 class Account(AbstractBaseUser):
 
     email               = models.EmailField(verbose_name='email', max_length=60, unique=True)
@@ -87,7 +82,77 @@ class Account(AbstractBaseUser):
         return True
 
 
-@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+class MyBusinessAccountManager(BaseUserManager):
+    def create_user(self, business, email, permission, password=None):
+        if not business:
+            raise ValueError("Users must have business")
+        if not email:
+            raise ValueError("Users must have email")
+        if not permission:
+            raise ValueError("Users must have permission")
+
+        user = self.model(
+            business = business,
+            email = self.normalize_email(email),
+            permission = permission,
+        )
+        user.set_password(password)
+        user.save(using = self._db)
+        return user
+
+
+class Business(models.Model):
+
+    name               = models.CharField(verbose_name='name', max_length=60)
+    email              = models.EmailField(verbose_name='email', max_length=60, unique=True)
+    card_image         = models.CharField(verbose_name='card_image', max_length=60, default='/card')
+    stamp_need         = models.IntegerField(verbose_name= 'stamp_need',default=9)
+
+    def __str__(self):
+        return self.name
+
+
+class BusinessAccount(AbstractBaseUser):
+
+    business            = models.ForeignKey(Business, on_delete=models.CASCADE)
+    email               = models.EmailField(verbose_name='email', max_length=60, unique=True)
+    permission          = models.BooleanField(verbose_name='permission', default=False)
+    is_admin            = models.BooleanField(default=False)
+    is_active           = models.BooleanField(default=True)
+    is_staff            = models.BooleanField(default=False)
+    is_superuser        = models.BooleanField(default=False)
+
+    USERNAME_FIELD      = 'email'
+    REQUIRED_FIELDS     = ["email", 'permission']
+
+    objects = MyBusinessAccountManager()
+
+    def __str__(self):
+        return self.email
+
+    def has_perm(self, perm, obj = None):
+        return self.is_admin
+
+    def is_admin(self):
+        return self.permission
+    
+    def has_module_perms(self, app_label):
+        return True
+
+
+class BusinessToken(models.Model):
+
+    token              = models.CharField(verbose_name='token', max_length=60)
+    business_user      = models.ForeignKey(BusinessAccount, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.token
+
+
+@receiver(post_save, sender=(settings.AUTH_USER_MODEL or BusinessAccount))
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)
+
+
+
