@@ -24,7 +24,11 @@ def obtain_business_token(request):
     try:
         user = BusinessAccount.objects.get(email=request.data.get("username"))
         if user.check_password(request.data.get("password")):
-            return create_business_token(user.email)
+            try:
+                token = BusinessToken.objects.get(business_user=user)
+                return token.token
+            except BusinessToken.DoesNotExist:
+                return create_business_token(user.email)
         else:
             return None
     except BusinessAccount.DoesNotExist:
@@ -33,15 +37,14 @@ def obtain_business_token(request):
 
 class BusinessAuthentication(authentication.BaseAuthentication):
     def authenticate(self, request):
-        token = request.META.get("HTTP_AUTHORIZATION") # get the token from header
-        if not token: # no token passed in request headers
-            return None # authentication did not succeed
+        token = request.META.get("HTTP_AUTHORIZATION")  # get the token from header
+        if not token:  # no token passed in request headers
+            return None  # authentication did not succeed
 
         try:
-            business_token = BusinessToken.objects.get(token = token[6:])
-            user = business_token.business_user # get the user
+            business_token = BusinessToken.objects.get(token=token[6:])
+            user = business_token.business_user  # get the user
         except BusinessToken.DoesNotExist:
-            raise exceptions.AuthenticationFailed('No such user') # raise exception if user does not exist
+            raise exceptions.AuthenticationFailed('No such user')  # raise exception if user does not exist
 
-        return (user, None) # authentication successful
-
+        return (user, None)  # authentication successful
