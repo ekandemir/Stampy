@@ -80,7 +80,27 @@ class BusinessUserRegistrationSerializer(serializers.ModelSerializer):
         return account
 
 
+class CardSerializer(serializers.Serializer):
+    business_id = serializers.CharField(required=True, allow_blank=False, max_length=100)
+    stamp_number = serializers.IntegerField(default=0)
+    stamp_total = serializers.IntegerField(default=9)
+    token = serializers.CharField(required=True, allow_blank=False, max_length=100)
 
+    def save(self):
+        customer = Token.objects.get(key=self.validated_data['token']).user
+        business = Business.objects.get(id=self.validated_data['business_id'])
+        card = Card(customer=customer,
+                    business=business,
+                    stamp_number=0,
+                    stamp_total=business.stamp_need)
+
+        card.save()
+        return card
+
+
+
+    def create(self, validated_data):
+        return Card.objects.create(**validated_data)
 
 class ChangePasswordSerializer(serializers.Serializer):
 
