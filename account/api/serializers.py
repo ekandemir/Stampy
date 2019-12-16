@@ -126,9 +126,12 @@ class ChangePasswordSerializer(serializers.Serializer):
     password2 = serializers.CharField(style={'input_type': 'password'}, required=True)
 
     def update(self, user):
-        if self.validated_data["password1"] == self.validated_data["password2"]:
-            user.set_password(self.validated_data["password2"])
-            user.save()
-            return user
+        if user.check_password(self.validated_data["old_password"]):
+            if self.validated_data["password1"] == self.validated_data["password2"]:
+                user.set_password(self.validated_data["password2"])
+                user.save()
+                return True,user
+            else:
+                return False,"Passwords didn't match"
         else:
-            return None
+            return False,"Old password didn't match"
