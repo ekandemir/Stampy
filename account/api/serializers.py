@@ -46,6 +46,8 @@ class BusinessRegisterSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True, allow_blank=False)
     card_image = serializers.CharField(required=True, allow_blank=False, max_length=100)
     stamp_need = serializers.IntegerField(required=True)
+    latitude = serializers.FloatField(required=True)
+    longitude = serializers.FloatField(required=True)
 
     def create(self, validated_data):
         return Business.objects.create(**validated_data)

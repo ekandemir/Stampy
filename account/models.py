@@ -111,6 +111,8 @@ class Business(models.Model):
     email = models.EmailField(verbose_name='email', max_length=60, unique=True)
     card_image = models.CharField(verbose_name='card_image', max_length=60, default='/card')
     stamp_need = models.IntegerField(verbose_name='stamp_need', default=9)
+    latitude = models.FloatField(verbose_name="latitude", default=0.0)
+    longitude = models.FloatField(verbose_name="longitude", default=0.0)
 
     def __str__(self):
         return self.name

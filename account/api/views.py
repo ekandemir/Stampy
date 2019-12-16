@@ -56,13 +56,12 @@ def logout_view(request):
 def change_password_view(request):
     serializer = ChangePasswordSerializer(data=request.data)
     if serializer.is_valid():
-        a , b = serializer.update(request.user)
+        a, b = serializer.update(request.user)
         if a:
             return Response({"success": "Password successfully changed."},
-                        status=status.HTTP_200_OK)
+                            status=status.HTTP_200_OK)
         else:
             return Response(b, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 @api_view(['POST'])
@@ -210,6 +209,7 @@ def get_qr_view(request):
     except Business.DoesNotExist:
         return Response({"success": ""}, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['POST'])
 @authentication_classes([BusinessAuthentication])
 def validate_qr_view(request):
@@ -224,10 +224,31 @@ def validate_qr_view(request):
                 cards[0].save()
 
             return Response({"success": "Successfully stamped."},
-                        status=status.HTTP_200_OK)
+                            status=status.HTTP_200_OK)
         return Response({"success": ""}, status=status.HTTP_400_BAD_REQUEST)
     except Business.DoesNotExist:
         return Response({"success": ""}, status=status.HTTP_400_BAD_REQUEST)
     except Card.DoesNotExist:
         return Response({"success": ""}, status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(['POST'])
+def business_list_location(request):
+    try:
+        longitude = request.data.get("longitude")
+        latitude = request.data.get("latitude")
+        distance = request.data.get("distance")
+        businesses = Business.objects.filter(longitude__lte=longitude + distance).filter(longitude__gte=longitude - distance). \
+            filter(latitude__lte=latitude + distance).filter(latitude__gte=latitude - distance)
+        business_data=[]
+        for business in businesses:
+            business_data.append({"business_name":business.name,
+                                  "business_email":business.email,
+                                  "latitude":business.latitude,
+                                  "longitude": business.longitude})
+        return Response({"success": "Successfully returned.", "businesses": business_data},
+                        status=status.HTTP_200_OK)
+    except Business.DoesNotExist:
+        return Response({"success": ""}, status=status.HTTP_400_BAD_REQUEST)
+    except Card.DoesNotExist:
+        return Response({"success": ""}, status=status.HTTP_400_BAD_REQUEST)
