@@ -11,7 +11,8 @@ from account.api.views import (
     card_list_view,
     business_list_view,
     get_qr_view,
-    validate_qr_view)
+    validate_qr_view,
+    change_password_view)
 from rest_framework.authtoken.views import obtain_auth_token
 
 app_name = 'account'
@@ -24,7 +25,7 @@ urlpatterns = [
     path('logout_business', business_logout_view, name='logout_business'),
     path('register_business', business_registration_view, name='business_register'),
     path('business_user_register', business_user_registration_view, name='business_user_register'),
-    # path('change_password', change_password_view.as_view(), name="change_password"),
+    path('change_password', change_password_view, name="change_password"),
 
     path('card-add', card_add_view, name='card_add_view'),
     path('card-delete', card_delete_view, name='card_delete_view'),

@@ -53,6 +53,17 @@ def logout_view(request):
 
 
 @api_view(['POST'])
+def change_password_view(request):
+    serializer = ChangePasswordSerializer(data=request.data)
+    if serializer.is_valid():
+        if serializer.update(request.user):
+            return Response({"success": "Password successfully changed."},
+                        status=status.HTTP_200_OK)
+    return Response("Password didn't match error", status=status.HTTP_400_BAD_REQUEST)
+
+
+
+@api_view(['POST'])
 def business_registration_view(request):
     serializer = BusinessRegisterSerializer(data=request.data)
     if serializer.is_valid():
@@ -217,3 +228,4 @@ def validate_qr_view(request):
         return Response({"success": ""}, status=status.HTTP_400_BAD_REQUEST)
     except Card.DoesNotExist:
         return Response({"success": ""}, status=status.HTTP_400_BAD_REQUEST)
+

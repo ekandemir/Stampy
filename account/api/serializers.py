@@ -6,6 +6,7 @@ from rest_framework import serializers, fields
 from account.models import Account, Business, BusinessAccount, Card, BusinessToken, QRCode
 from rest_framework.authtoken.models import Token
 
+
 class RegistrationSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
     date = fields.DateField(input_formats=['%Y-%m-%d'])
@@ -45,7 +46,6 @@ class BusinessRegisterSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True, allow_blank=False)
     card_image = serializers.CharField(required=True, allow_blank=False, max_length=100)
     stamp_need = serializers.IntegerField(required=True)
-
 
     def create(self, validated_data):
         return Business.objects.create(**validated_data)
@@ -97,8 +97,6 @@ class CardSerializer(serializers.Serializer):
         card.save()
         return card
 
-
-
     def create(self, validated_data):
         return Card.objects.create(**validated_data)
 
@@ -118,13 +116,19 @@ class QRCodeSerializer(serializers.Serializer):
         qr_code.save()
         return qr_code
 
-
-
     def create(self, validated_data):
         return QRCode.objects.create(**validated_data)
 
 
 class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(style={'input_type': 'password'}, required=True)
-    new_password = serializers.CharField(style={'input_type': 'password'}, required=True)
-    confirm_new_password = serializers.CharField(style={'input_type': 'password'}, required=True)
+    password1 = serializers.CharField(style={'input_type': 'password'}, required=True)
+    password2 = serializers.CharField(style={'input_type': 'password'}, required=True)
+
+    def update(self, user):
+        if self.validated_data["password1"] == self.validated_data["password2"]:
+            user.set_password(self.validated_data["password2"])
+            user.save()
+            return user
+        else:
+            return None
