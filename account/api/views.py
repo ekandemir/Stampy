@@ -56,12 +56,12 @@ def logout_view(request):
 def change_password_view(request):
     serializer = ChangePasswordSerializer(data=request.data)
     if serializer.is_valid():
-        a , b = serializer.update(request.user)
-        if a:
+        return_value , return_data = serializer.update(request.user)
+        if return_value:
             return Response({"success": "Password successfully changed."},
                         status=status.HTTP_200_OK)
         else:
-            return Response(b, status=status.HTTP_400_BAD_REQUEST)
+            return Response(return_data, status=status.HTTP_400_BAD_REQUEST)
 
 
 
