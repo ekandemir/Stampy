@@ -33,15 +33,20 @@ def registration_view(request):
         data = {}
         if serializer.is_valid():
             account = serializer.save()
-            data['response'] = "Successfully registered new user."
             data['email'] = account.email
             data['phone'] = account.phone
             token = Token.objects.get(user=account).key
             data['token'] = token
             login(request, account)
+            return Response({"success": True,
+                             "message": "User has been created",
+                             "data": data},status=status.HTTP_200_OK)
         else:
-            data = serializer.errors
-        return Response(data)
+            return Response({"success": False,
+                             "message": "Invalid Information",
+                             "data": serializer.error,
+                             "error_code":0000},status=status.HTTP_400_BAD_REQUEST)
+
 
 
 @api_view(['POST'])
@@ -50,8 +55,9 @@ def logout_view(request):
 
     logout(request)
 
-    return Response({"success": "Successfully logged out."},
-                    status=status.HTTP_200_OK)
+    return Response({"success": True,
+                     "message": "Successfully logged out.",
+                     "data": {}}, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -60,10 +66,15 @@ def change_password_view(request):
     if serializer.is_valid():
         return_value , return_data = serializer.update(request.user)
         if return_value:
-            return Response({"success": "Password successfully changed."},
+            return Response({"success": True,
+                             "message": "Password successfully changed.",
+                             "data": {}},
                             status=status.HTTP_200_OK)
         else:
-            return Response(return_data, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"success": False,
+                             "message": return_data,
+                             "data": {},
+                             "error":0000}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -71,9 +82,14 @@ def business_registration_view(request):
     serializer = BusinessRegisterSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response({"success":True,
+                         "message":"Business successfully added.",
+                         "data":serializer.data}, status=status.HTTP_201_CREATED)
 
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    return Response({"success": True,
+                     "message": serializer.error,
+                     "data": {},
+                     "error": 0000}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -87,9 +103,14 @@ def business_user_registration_view(request):
             data['email'] = account.email
             token = create_business_token(user_email=account.email)
             data['token'] = token
+            return Response({"success": True,
+                             "message": "Business User has been created",
+                             "data": data}, status=status.HTTP_200_OK)
         else:
-            data = serializer.errors
-        return Response(data)
+            return Response({"success": False,
+                             "message": "Invalid Information",
+                             "data": serializer.error,
+                             "error_code": 0000}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -111,7 +132,9 @@ def business_user_login_view(request):
 def business_logout_view(request):
     delete_business_token(request)
 
-    return Response({"success": "Successfully logged out."},
+    return Response({"success": True,
+                     "message": "Successfully logged out.",
+                     "data": {}},
                     status=status.HTTP_200_OK)
 
 
@@ -123,9 +146,14 @@ def card_add_view(request):
     serializer = CardSerializer(data=data)
     if serializer.is_valid():
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"success": True,
+                         "message": "Business User has been created",
+                         "data": serializer.data}, status=status.HTTP_200_OK)
+    else:
+        return Response({"success": False,
+                         "message": "Invalid Information",
+                         "data": serializer.error,
+                         "error_code": 0000}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -138,12 +166,19 @@ def card_delete_view(request):
                                 business=Business.objects.get(id=request.data.get("business_id")))
         card.delete()
 
-        return Response({"success": "Successfully deleted."},
-                        status=status.HTTP_200_OK)
-    except Business.DoesNotExist:
-        return Response({"success": ""}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"success": True,
+                         "message": "Successfully deleted.",
+                         "data":{}}, status=status.HTTP_200_OK)
+        except Business.DoesNotExist:
+        return Response({"success": False,
+                         "message": "Business not found.",
+                         "data": {},
+                         "error": 0000}, status=status.HTTP_400_BAD_REQUEST)
     except Card.DoesNotExist:
-        return Response({"success": ""}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"success": False,
+                         "message": "Card not found.",
+                         "data": {},
+                         "error": 0000}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -161,12 +196,19 @@ def card_list_view(request):
                               "card_image": card.business.card_image,
                               "business_id": card.business.id})
 
-        return Response({"success": "Successfully returned.", "cards": card_data},
-                        status=status.HTTP_200_OK)
+        return Response({"success": True,
+                         "message": "Successfully returned.",
+                         "data":{"cards": card_data}}, status=status.HTTP_200_OK)
     except Business.DoesNotExist:
-        return Response({"success": ""}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"success": False,
+                         "message": "Business not found.",
+                         "data": {},
+                         "error":0000}, status=status.HTTP_400_BAD_REQUEST)
     except Card.DoesNotExist:
-        return Response({"success": ""}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"success": False,
+                         "message": "Card not found.",
+                         "data": {},
+                         "error":0000}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -185,12 +227,20 @@ def business_list_view(request):
                                   "business_id": business.id,
                                   "is_owned": business in cards_owned})
 
-        return Response({"success": "Successfully returned.", "businesses": business_data},
+        return Response({"success": True,
+                         "message":"Successfully returned.",
+                         "data":{"businesses": business_data}},
                         status=status.HTTP_200_OK)
     except Business.DoesNotExist:
-        return Response({"success": ""}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"success": False,
+                         "message": "Business not found.",
+                         "data": {},
+                         "error": 0000}, status=status.HTTP_400_BAD_REQUEST)
     except Card.DoesNotExist:
-        return Response({"success": ""}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"success": False,
+                         "message": "Card not found.",
+                         "data": {},
+                         "error": 0000}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -206,10 +256,19 @@ def get_qr_view(request):
         serializer = QRCodeSerializer(data=data)
         if serializer.is_valid():
             qr_code = serializer.save()
-            return Response({"qr_code": qr_code.qr_code}, status=status.HTTP_201_CREATED)
-        return Response({"qr_code": ""}, status=status.HTTP_201_CREATED)
+            return Response({"success": True,
+                         "message": "QR Code successfully created.",
+                         "data": {"qr_code": qr_code.qr_code}}, status=status.HTTP_201_CREATED)
+
+        return Response({"success": False,
+                         "message": "Data is not valid.",
+                         "data": {},
+                         "error":0000}, status=status.HTTP_400_BAD_REQUEST)
     except Business.DoesNotExist:
-        return Response({"success": ""}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"success": False,
+                         "message": "Business not found.",
+                         "data": {},
+                         "error": 0000}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -225,13 +284,24 @@ def validate_qr_view(request):
                 cards[0].stamp_number += 1
                 cards[0].save()
 
-            return Response({"success": "Successfully stamped."},
+            return Response({"success": True,
+                             "message": "Successfully stamped.",
+                             "data":{}},
                             status=status.HTTP_200_OK)
-        return Response({"success": ""}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"success": False,
+                         "message": "Data is invalid.",
+                         "data": {},
+                         "error": 0000}, status=status.HTTP_400_BAD_REQUEST)
     except Business.DoesNotExist:
-        return Response({"success": ""}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"success": False,
+                         "message": "Business not found.",
+                         "data": {},
+                         "error": 0000}, status=status.HTTP_400_BAD_REQUEST)
     except Card.DoesNotExist:
-        return Response({"success": ""}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"success": False,
+                         "message": "Card not found.",
+                         "data": {},
+                         "error": 0000}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -248,12 +318,14 @@ def business_list_location(request):
                                   "business_email":business.email,
                                   "latitude":business.latitude,
                                   "longitude": business.longitude})
-        return Response({"success": "Successfully returned.", "businesses": business_data},
-                        status=status.HTTP_200_OK)
+        return Response({"success": True,
+                         "message": "Successfully returned.",
+                         "data":{"businesses": business_data}}, status=status.HTTP_200_OK)
     except Business.DoesNotExist:
-        return Response({"success": ""}, status=status.HTTP_400_BAD_REQUEST)
-    except Card.DoesNotExist:
-        return Response({"success": ""}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"success": False,
+                         "message": "Business not found.",
+                         "data": {},
+                         "error": 0000}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -266,6 +338,11 @@ def offer_add_view(request):
     serializer = OfferSerializer(data=data)
     if serializer.is_valid():
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"success": True,
+                         "message": "Business User has been created",
+                         "data": serializer.data}, status=status.HTTP_200_OK)
+    else:
+        return Response({"success": False,
+                         "message": "Invalid Information",
+                         "data": serializer.error,
+                         "error_code": 0000}, status=status.HTTP_400_BAD_REQUEST)
