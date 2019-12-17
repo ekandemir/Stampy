@@ -23,12 +23,12 @@ app_name = 'account'
 urlpatterns = [
     path('register', registration_view, name='register'),
     path('login', obtain_auth_token, name='login'),
-    path('login_business', business_user_login_view, name='login_business'),
+    path('login-business', business_user_login_view, name='login_business'),
     path('logout', logout_view, name='logout'),
-    path('logout_business', business_logout_view, name='logout_business'),
-    path('register_business', business_registration_view, name='business_register'),
-    path('business_user_register', business_user_registration_view, name='business_user_register'),
-    path('change_password', change_password_view, name="change_password"),
+    path('logout-business', business_logout_view, name='logout_business'),
+    path('register-business', business_registration_view, name='business_register'),
+    path('business-user_register', business_user_registration_view, name='business_user_register'),
+    path('change-password', change_password_view, name="change_password"),
 
     path('card-add', card_add_view, name='card_add_view'),
     path('card-delete', card_delete_view, name='card_delete_view'),
