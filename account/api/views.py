@@ -250,12 +250,10 @@ def card_list_view(request):
                          "error": 0000}, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['POST'])
+@api_view(['GET'])
 def business_list_view(request):
     try:
         token = request.META.get("HTTP_AUTHORIZATION")[6:]
-        data = request.data
-        data['token'] = token
         user = Token.objects.get(key=token).user
         businesses = Business.objects.all()
         business_data = []
