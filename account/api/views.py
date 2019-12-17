@@ -76,6 +76,21 @@ def change_password_view(request):
                              "error": 0000}, status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(['GET'])
+def get_user(request):
+    user = request.user
+    data = {"name":user.name,
+            "surname":user.surname,
+            "email":user.email,
+            "phone":user.phone,
+            "dob":user.dob,
+            "gender":user.gender}
+    return Response({"success": True,
+                     "message": "Business successfully added.",
+                     "data": data}, status=status.HTTP_200_OK)
+
+
+
 @api_view(['POST'])
 def business_registration_view(request):
     serializer = BusinessRegisterSerializer(data=request.data)

@@ -15,7 +15,8 @@ from account.api.views import (
     change_password_view,
     business_list_location,
     offer_add_view,
-    offer_list_view)
+    offer_list_view,
+    get_user)
 
 from rest_framework.authtoken.views import obtain_auth_token
 
@@ -30,6 +31,7 @@ urlpatterns = [
     path('register-business', business_registration_view, name='business_register'),
     path('business-user_register', business_user_registration_view, name='business_user_register'),
     path('change-password', change_password_view, name="change_password"),
+    path('get-user',get_user, name="get_user"),
 
     path('card-add', card_add_view, name='card_add_view'),
     path('card-delete', card_delete_view, name='card_delete_view'),
