@@ -3,9 +3,15 @@ from abc import ABC
 
 from rest_framework import serializers, fields
 
-from account.models import Account, Business, BusinessAccount, Card, BusinessToken, QRCode
 from rest_framework.authtoken.models import Token
 
+from account.models import (Account,
+                            Business,
+                            BusinessToken,
+                            BusinessAccount,
+                            Card,
+                            QRCode,
+                            Offer)
 
 class RegistrationSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
@@ -82,26 +88,6 @@ class BusinessUserRegistrationSerializer(serializers.ModelSerializer):
         return account
 
 
-class CardSerializer(serializers.Serializer):
-    business_id = serializers.CharField(required=True, allow_blank=False, max_length=100)
-    stamp_number = serializers.IntegerField(default=0)
-    stamp_total = serializers.IntegerField(default=9)
-    token = serializers.CharField(required=True, allow_blank=False, max_length=100)
-
-    def save(self):
-        customer = Token.objects.get(key=self.validated_data['token']).user
-        business = Business.objects.get(id=self.validated_data['business_id'])
-        card = Card(customer=customer,
-                    business=business,
-                    stamp_number=0,
-                    stamp_total=business.stamp_need)
-
-        card.save()
-        return card
-
-    def create(self, validated_data):
-        return Card.objects.create(**validated_data)
-
 
 class QRCodeSerializer(serializers.Serializer):
     business_id = serializers.CharField(required=True, allow_blank=False, max_length=100)
@@ -137,3 +123,44 @@ class ChangePasswordSerializer(serializers.Serializer):
                 return False,"Passwords didn't match"
         else:
             return False,"Old password didn't match"
+
+
+class OfferSerializer(serializers.Serializer):
+    business_id = serializers.CharField(required=True, allow_blank=False, max_length=100)
+    offer_date = serializers.DateField(required=True)
+    offer_expire_date = serializers.DateField(required=True)
+    offer_body = serializers.CharField(allow_blank=False,max_length=1000)
+
+    def save(self):
+        offer = Offer(business_id=self.validated_data['business_id'],
+                      offer_date=self.validated_data['offer_date'],
+                      offer_expire_date=self.validated_data['offer_expire_date'],
+                      offer_body=self.validated_data['offer_body'])
+
+        offer.save()
+        return offer
+
+    def create(self, validated_data):
+        return Offer.objects.create(**validated_data)
+
+
+class CardSerializer(serializers.Serializer):
+    business_id = serializers.CharField(required=True, allow_blank=False, max_length=100)
+    stamp_number = serializers.IntegerField(default=0)
+    stamp_total = serializers.IntegerField(default=9)
+    token = serializers.CharField(required=True, allow_blank=False, max_length=100)
+
+    def save(self):
+        customer = Token.objects.get(key=self.validated_data['token']).user
+        business = Business.objects.get(id=self.validated_data['business_id'])
+        card = Card(customer=customer,
+                    business=business,
+                    stamp_number=0,
+                    stamp_total=business.stamp_need)
+
+        card.save()
+        return card
+
+    def create(self, validated_data):
+        return Card.objects.create(**validated_data)
+

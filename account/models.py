@@ -162,6 +162,7 @@ class Card(models.Model):
     stamp_number = models.IntegerField(verbose_name='stamp_number', default=0)
     stamp_total = models.IntegerField(verbose_name='stamp_total', default=9)
 
+
 # !----! Card User !-------
 class QRCode(models.Model):
     customer = models.ForeignKey(Account, on_delete=models.CASCADE)
@@ -169,11 +170,28 @@ class QRCode(models.Model):
     qr_code = models.CharField(verbose_name='stamp_number',max_length=36)
 
 
-
-
+# ------ Offers --------
+class Offer(models.Model):
+    business = models.ForeignKey(Business, on_delete=models.CASCADE)
+    offer_date = models.DateField(verbose_name='offer_date', default=datetime.date(2019, 12, 30))
+    offer_expire_date = models.DateField(verbose_name='offer_expire_date', default=datetime.date(2020, 12, 30))
+    offer_body = models.CharField(verbose_name='offer_body',max_length=1000)
 
 
 @receiver(post_save, sender=(settings.AUTH_USER_MODEL or BusinessAccount))
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)
+
+
+
+
+
+
+
+
+
+
+
+
+
