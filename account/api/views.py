@@ -8,7 +8,8 @@ from account.api.serializers import (RegistrationSerializer,
                                      BusinessRegisterSerializer,
                                      BusinessUserRegistrationSerializer,
                                      CardSerializer,
-                                     QRCodeSerializer)
+                                     QRCodeSerializer,
+                                     OfferSerializer)
 from rest_framework.authtoken.models import Token
 from account.api.stamp import get_qr_code
 
@@ -21,7 +22,8 @@ from account.models import (Account,
                             BusinessToken,
                             BusinessAccount,
                             Card,
-                            QRCode)
+                            QRCode,
+                            Offer)
 
 
 @api_view(['POST'])
@@ -230,4 +232,19 @@ def validate_qr_view(request):
         return Response({"success": ""}, status=status.HTTP_400_BAD_REQUEST)
     except Card.DoesNotExist:
         return Response({"success": ""}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@authentication_classes([BusinessAuthentication])
+def offer_add_view(request):
+    token = request.META.get("HTTP_AUTHORIZATION")[6:]
+    business = BusinessToken.objects.get(token=token).business_user
+    data = request.data
+    data['business_id'] = business.id
+    serializer = OfferSerializer(data=data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
