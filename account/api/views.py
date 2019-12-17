@@ -16,7 +16,8 @@ from account.api.stamp import get_qr_code
 from account.api.auth import (create_business_token,
                               delete_business_token,
                               BusinessAuthentication,
-                              obtain_business_token)
+                              obtain_business_token,
+                              BusinessAdminAuthentication)
 from account.models import (Account,
                             Business,
                             BusinessToken,
@@ -107,6 +108,7 @@ def business_registration_view(request):
 
 
 @api_view(['POST'])
+@authentication_classes([BusinessAdminAuthentication])
 def business_user_registration_view(request):
     if request.method == 'POST':
         serializer = BusinessUserRegistrationSerializer(data=request.data)
@@ -122,8 +124,8 @@ def business_user_registration_view(request):
                              "data": data}, status=status.HTTP_200_OK)
         else:
             return Response({"success": False,
-                             "message": "Invalid Information",
-                             "data": serializer.error,
+                             "message": "Invalid Data",
+                             "data": {},
                              "error_code": 0000}, status=status.HTTP_400_BAD_REQUEST)
 
 

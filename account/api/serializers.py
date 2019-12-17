@@ -61,7 +61,9 @@ class BusinessRegisterSerializer(serializers.Serializer):
 
 class BusinessUserRegistrationSerializer(serializers.ModelSerializer):
     business_email = serializers.EmailField()
+    password = serializers.CharField(style={'input_type': 'password'}, write_only=True)
     password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
+    email = serializers.EmailField()
 
     class Meta:
         model = BusinessAccount

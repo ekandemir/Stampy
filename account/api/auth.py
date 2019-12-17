@@ -48,3 +48,19 @@ class BusinessAuthentication(authentication.BaseAuthentication):
             raise exceptions.AuthenticationFailed('No such user')  # raise exception if user does not exist
 
         return (user, None)  # authentication successful
+
+class BusinessAdminAuthentication(authentication.BaseAuthentication):
+    def authenticate(self, request):
+        token = request.META.get("HTTP_AUTHORIZATION")  # get the token from header
+        try:
+            if not token:  # no token passed in request headers
+                return None  # authentication did not succeed
+            else:
+                business_token = BusinessToken.objects.get(token=token[6:])
+                user = business_token.business_user
+                if user.permission == 0:
+                    return None
+        except BusinessToken.DoesNotExist:
+            raise exceptions.AuthenticationFailed('No such user')  # raise exception if user does not exist
+
+        return (user, None)  # authentication successful
