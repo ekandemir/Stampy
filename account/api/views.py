@@ -1,4 +1,5 @@
 from rest_framework import status
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from django.contrib.auth import logout, login
@@ -78,17 +79,39 @@ def change_password_view(request):
 
 
 @api_view(['GET'])
+@authentication_classes([TokenAuthentication, BusinessAuthentication])
 def get_user(request):
-    user = request.user
-    data = {"name":user.name,
-            "surname":user.surname,
-            "email":user.email,
-            "phone":user.phone,
-            "dob":user.dob,
-            "gender":user.gender}
-    return Response({"success": True,
-                     "message": "Business successfully added.",
-                     "data": data}, status=status.HTTP_200_OK)
+    try:
+        user = request.user
+        data = {"user-type": "customer",
+                "user": {"name": user.name,
+                         "surname": user.surname,
+                         "email": user.email,
+                         "phone": user.phone,
+                         "dob": user.dob,
+                         "gender": user.gender}}
+
+        return Response({"success": True,
+                         "message": "User returned.",
+                         "data": data}, status=status.HTTP_200_OK)
+    except Account.DoesNotExist:
+        token = request.META.get("HTTP_AUTHORIZATION")[6:]
+        user = BusinessToken.objects.get(token=token).business_user
+        if user.permission:
+            type = "business_admin"
+        else:
+            type = "business_cashier"
+        data = {"user-type": type,
+                "user": {
+                    "business": user.business.name,
+                    "email": user.email,
+                    "permission": user.permission}}
+
+        return Response({"success": True,
+                         "message": "User Returned.",
+                         "data": data}, status=status.HTTP_200_OK)
+
+
 
 
 
