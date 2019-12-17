@@ -14,7 +14,8 @@ from account.api.views import (
     validate_qr_view,
     change_password_view,
     business_list_location,
-    offer_add_view)
+    offer_add_view,
+    offer_list_view)
 
 from rest_framework.authtoken.views import obtain_auth_token
 
@@ -42,6 +43,7 @@ urlpatterns = [
 
 
     path('offer-add', offer_add_view, name='offer_add_view'),
+    path('offer-list', offer_list_view, name='offer_list_view'),
 
 
 

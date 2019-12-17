@@ -40,13 +40,12 @@ def registration_view(request):
             login(request, account)
             return Response({"success": True,
                              "message": "User has been created",
-                             "data": data},status=status.HTTP_200_OK)
+                             "data": data}, status=status.HTTP_200_OK)
         else:
             return Response({"success": False,
                              "message": "Invalid Information",
                              "data": serializer.error,
-                             "error_code":0000},status=status.HTTP_400_BAD_REQUEST)
-
+                             "error_code": 0000}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -64,7 +63,7 @@ def logout_view(request):
 def change_password_view(request):
     serializer = ChangePasswordSerializer(data=request.data)
     if serializer.is_valid():
-        return_value , return_data = serializer.update(request.user)
+        return_value, return_data = serializer.update(request.user)
         if return_value:
             return Response({"success": True,
                              "message": "Password successfully changed.",
@@ -74,7 +73,7 @@ def change_password_view(request):
             return Response({"success": False,
                              "message": return_data,
                              "data": {},
-                             "error":0000}, status=status.HTTP_400_BAD_REQUEST)
+                             "error": 0000}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -82,9 +81,9 @@ def business_registration_view(request):
     serializer = BusinessRegisterSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
-        return Response({"success":True,
-                         "message":"Business successfully added.",
-                         "data":serializer.data}, status=status.HTTP_201_CREATED)
+        return Response({"success": True,
+                         "message": "Business successfully added.",
+                         "data": serializer.data}, status=status.HTTP_201_CREATED)
 
     return Response({"success": True,
                      "message": serializer.error,
@@ -168,8 +167,8 @@ def card_delete_view(request):
 
         return Response({"success": True,
                          "message": "Successfully deleted.",
-                         "data":{}}, status=status.HTTP_200_OK)
-        except Business.DoesNotExist:
+                         "data": {}}, status=status.HTTP_200_OK)
+    except Business.DoesNotExist:
         return Response({"success": False,
                          "message": "Business not found.",
                          "data": {},
@@ -198,17 +197,17 @@ def card_list_view(request):
 
         return Response({"success": True,
                          "message": "Successfully returned.",
-                         "data":{"cards": card_data}}, status=status.HTTP_200_OK)
+                         "data": {"cards": card_data}}, status=status.HTTP_200_OK)
     except Business.DoesNotExist:
         return Response({"success": False,
                          "message": "Business not found.",
                          "data": {},
-                         "error":0000}, status=status.HTTP_400_BAD_REQUEST)
+                         "error": 0000}, status=status.HTTP_400_BAD_REQUEST)
     except Card.DoesNotExist:
         return Response({"success": False,
                          "message": "Card not found.",
                          "data": {},
-                         "error":0000}, status=status.HTTP_400_BAD_REQUEST)
+                         "error": 0000}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -228,8 +227,8 @@ def business_list_view(request):
                                   "is_owned": business in cards_owned})
 
         return Response({"success": True,
-                         "message":"Successfully returned.",
-                         "data":{"businesses": business_data}},
+                         "message": "Successfully returned.",
+                         "data": {"businesses": business_data}},
                         status=status.HTTP_200_OK)
     except Business.DoesNotExist:
         return Response({"success": False,
@@ -257,13 +256,13 @@ def get_qr_view(request):
         if serializer.is_valid():
             qr_code = serializer.save()
             return Response({"success": True,
-                         "message": "QR Code successfully created.",
-                         "data": {"qr_code": qr_code.qr_code}}, status=status.HTTP_201_CREATED)
+                             "message": "QR Code successfully created.",
+                             "data": {"qr_code": qr_code.qr_code}}, status=status.HTTP_201_CREATED)
 
         return Response({"success": False,
                          "message": "Data is not valid.",
                          "data": {},
-                         "error":0000}, status=status.HTTP_400_BAD_REQUEST)
+                         "error": 0000}, status=status.HTTP_400_BAD_REQUEST)
     except Business.DoesNotExist:
         return Response({"success": False,
                          "message": "Business not found.",
@@ -286,7 +285,7 @@ def validate_qr_view(request):
 
             return Response({"success": True,
                              "message": "Successfully stamped.",
-                             "data":{}},
+                             "data": {}},
                             status=status.HTTP_200_OK)
         return Response({"success": False,
                          "message": "Data is invalid.",
@@ -310,17 +309,18 @@ def business_list_location(request):
         longitude = request.data.get("longitude")
         latitude = request.data.get("latitude")
         distance = request.data.get("distance")
-        businesses = Business.objects.filter(longitude__lte=longitude + distance).filter(longitude__gte=longitude - distance). \
+        businesses = Business.objects.filter(longitude__lte=longitude + distance).filter(
+            longitude__gte=longitude - distance). \
             filter(latitude__lte=latitude + distance).filter(latitude__gte=latitude - distance)
-        business_data=[]
+        business_data = []
         for business in businesses:
-            business_data.append({"business_name":business.name,
-                                  "business_email":business.email,
-                                  "latitude":business.latitude,
+            business_data.append({"business_name": business.name,
+                                  "business_email": business.email,
+                                  "latitude": business.latitude,
                                   "longitude": business.longitude})
         return Response({"success": True,
                          "message": "Successfully returned.",
-                         "data":{"businesses": business_data}}, status=status.HTTP_200_OK)
+                         "data": {"businesses": business_data}}, status=status.HTTP_200_OK)
     except Business.DoesNotExist:
         return Response({"success": False,
                          "message": "Business not found.",
@@ -346,3 +346,27 @@ def offer_add_view(request):
                          "message": "Invalid Information",
                          "data": serializer.error,
                          "error_code": 0000}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def offer_list_view(request):
+    try:
+        token = request.META.get("HTTP_AUTHORIZATION")[6:]
+        user = Token.objects.get(key=token).user
+        offers = Offer.objects.all()
+        offer_data = []
+        for offer in offers:
+            offer_data.append({"business_id": offer.business.id,
+                               "offer_date": offer.offer_date,
+                               "offer_expire_date": offer.offer_expire_date,
+                               "offer_body": offer.offer_body})
+
+        return Response({"success": True,
+                         "message": "Successfully returned.",
+                         "data": {"offers": offer_data}},
+                        status=status.HTTP_200_OK)
+    except Offer.DoesNotExist:
+        return Response({"success": False,
+                         "message": "Offer not found.",
+                         "data": {},
+                         "error": 0000}, status=status.HTTP_400_BAD_REQUEST)
