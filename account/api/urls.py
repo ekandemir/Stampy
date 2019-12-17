@@ -13,11 +13,9 @@ from account.api.views import (
     get_qr_view,
     validate_qr_view,
     change_password_view,
-<<<<<<< HEAD
-    business_list_location)
-=======
+    business_list_location,
     offer_add_view)
->>>>>>> feature/offers
+
 from rest_framework.authtoken.views import obtain_auth_token
 
 app_name = 'account'

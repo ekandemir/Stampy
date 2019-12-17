@@ -58,13 +58,8 @@ def logout_view(request):
 def change_password_view(request):
     serializer = ChangePasswordSerializer(data=request.data)
     if serializer.is_valid():
-<<<<<<< HEAD
-        a, b = serializer.update(request.user)
-        if a:
-=======
         return_value , return_data = serializer.update(request.user)
         if return_value:
->>>>>>> feature/offers
             return Response({"success": "Password successfully changed."},
                             status=status.HTTP_200_OK)
         else:
@@ -240,7 +235,6 @@ def validate_qr_view(request):
 
 
 @api_view(['POST'])
-<<<<<<< HEAD
 def business_list_location(request):
     try:
         longitude = request.data.get("longitude")
@@ -260,7 +254,9 @@ def business_list_location(request):
         return Response({"success": ""}, status=status.HTTP_400_BAD_REQUEST)
     except Card.DoesNotExist:
         return Response({"success": ""}, status=status.HTTP_400_BAD_REQUEST)
-=======
+
+
+@api_view(['POST'])
 @authentication_classes([BusinessAuthentication])
 def offer_add_view(request):
     token = request.META.get("HTTP_AUTHORIZATION")[6:]
@@ -273,5 +269,3 @@ def offer_add_view(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
->>>>>>> feature/offers
