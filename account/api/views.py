@@ -44,8 +44,8 @@ def registration_view(request):
                              "data": data}, status=status.HTTP_200_OK)
         else:
             return Response({"success": False,
-                             "message": "Invalid Information",
-                             "data": serializer.error,
+                             "message": "Invalid Data",
+                             "data": {},
                              "error_code": 0000}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -102,7 +102,7 @@ def business_registration_view(request):
                          "data": serializer.data}, status=status.HTTP_201_CREATED)
 
     return Response({"success": True,
-                     "message": serializer.error,
+                     "message": "Invalid data.",
                      "data": {},
                      "error": 0000}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -167,8 +167,8 @@ def card_add_view(request):
                          "data": serializer.data}, status=status.HTTP_200_OK)
     else:
         return Response({"success": False,
-                         "message": "Invalid Information",
-                         "data": serializer.error,
+                         "message": "Invalid Data",
+                         "data": {},
                          "error_code": 0000}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -360,8 +360,8 @@ def offer_add_view(request):
                          "data": serializer.data}, status=status.HTTP_200_OK)
     else:
         return Response({"success": False,
-                         "message": "Invalid Information",
-                         "data": serializer.error,
+                         "message": "Invalid Data",
+                         "data": {},
                          "error_code": 0000}, status=status.HTTP_400_BAD_REQUEST)
 
 
