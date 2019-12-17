@@ -220,12 +220,10 @@ def card_delete_view(request):
                          "error": 0000}, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['POST'])
+@api_view(['GET'])
 def card_list_view(request):
     try:
         token = request.META.get("HTTP_AUTHORIZATION")[6:]
-        data = request.data
-        data['token'] = token
         user = Token.objects.get(key=token).user
         cards = Card.objects.filter(customer=user)
         card_all = Card.objects.all()
