@@ -2,6 +2,7 @@ from secrets import token_urlsafe
 from account.models import BusinessAccount, BusinessToken
 from rest_framework import authentication
 from rest_framework import exceptions
+from rest_framework.authtoken.models import Token
 
 
 def create_business_token(user_email):
@@ -49,6 +50,7 @@ class BusinessAuthentication(authentication.BaseAuthentication):
 
         return (user, None)  # authentication successful
 
+
 class BusinessAdminAuthentication(authentication.BaseAuthentication):
     def authenticate(self, request):
         token = request.META.get("HTTP_AUTHORIZATION")  # get the token from header
@@ -64,3 +66,22 @@ class BusinessAdminAuthentication(authentication.BaseAuthentication):
             raise exceptions.AuthenticationFailed('No such user')  # raise exception if user does not exist
 
         return (user, None)  # authentication successful
+
+
+class UserOrBusinessAuthentication(authentication.BaseAuthentication):
+    def authenticate(self, request):
+        token = request.META.get("HTTP_AUTHORIZATION")  # get the token from header
+
+        if not token:  # no token passed in request headers
+            return None  # authentication did not succeed
+
+        try:
+            user = Token.objects.get(key=token[6:]).user
+        except Token.DoesNotExist:
+            try:
+                user = BusinessToken.objects.get(token=token[6:]).business_user  # get the user
+            except BusinessToken.DoesNotExist:
+                raise exceptions.AuthenticationFailed('Invalid Token')  # raise exception if user does not exist
+
+        return (user, None)  # authentication successful
+

@@ -18,7 +18,8 @@ from account.api.auth import (create_business_token,
                               delete_business_token,
                               BusinessAuthentication,
                               obtain_business_token,
-                              BusinessAdminAuthentication)
+                              BusinessAdminAuthentication,
+                              UserOrBusinessAuthentication)
 from account.models import (Account,
                             Business,
                             BusinessToken,
@@ -79,8 +80,7 @@ def change_password_view(request):
 
 
 @api_view(['GET'])
-@authentication_classes([BusinessAuthentication])
-@authentication_classes([TokenAuthentication])
+@authentication_classes([UserOrBusinessAuthentication])
 def get_user(request):
     user = request.user
     if isinstance(user,Account):
