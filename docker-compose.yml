@@ -27,8 +27,8 @@ services:
       - postgres
       - redis
     environment:
-      - POSTGRES_USER=db_user
-      - POSTGRES_PASSWORD=db_pass
+      - POSTGRES_USER=db_stampy
+      - POSTGRES_PASSWORD=db_FcRunc6BZ
       - DATABASE_NAME=postgres
       - DATABASE_HOST=postgres
       - DATABASE_PORT=5432
