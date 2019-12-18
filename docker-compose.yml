@@ -7,6 +7,16 @@ services:
   redis:
     build: ./compose/redis
     container_name: sample_redis
+  postgres:
+    image: postgres:11
+    container_name: sample_postgres
+    volumes:
+      - psqldbdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=db_user
+      - POSTGRES_PASSWORD=db_pass
+    ports:
+      - "5432:5432"
   django:
     build:
       context: .
@@ -14,6 +24,7 @@ services:
     container_name: sample_django
     command: bash -c "python manage.py runserver 0.0.0.0:8000"
     depends_on:
+      - postgres
       - redis
     environment:
       - POSTGRES_USER=db_user

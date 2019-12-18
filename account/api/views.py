@@ -79,10 +79,12 @@ def change_password_view(request):
 
 
 @api_view(['GET'])
-@authentication_classes([TokenAuthentication, BusinessAuthentication])
+@authentication_classes([BusinessAuthentication])
+@authentication_classes([TokenAuthentication])
 def get_user(request):
-    try:
-        user = request.user
+    user = request.user
+    if isinstance(user,Account):
+
         data = {"user-type": "customer",
                 "user": {"name": user.name,
                          "surname": user.surname,
@@ -94,7 +96,7 @@ def get_user(request):
         return Response({"success": True,
                          "message": "User returned.",
                          "data": data}, status=status.HTTP_200_OK)
-    except Account.DoesNotExist:
+    else:
         token = request.META.get("HTTP_AUTHORIZATION")[6:]
         user = BusinessToken.objects.get(token=token).business_user
         if user.permission:

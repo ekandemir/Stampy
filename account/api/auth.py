@@ -45,7 +45,7 @@ class BusinessAuthentication(authentication.BaseAuthentication):
             business_token = BusinessToken.objects.get(token=token[6:])
             user = business_token.business_user  # get the user
         except BusinessToken.DoesNotExist:
-            raise exceptions.AuthenticationFailed('No such user')  # raise exception if user does not exist
+            raise exceptions.AuthenticationFailed('Invalid Token')  # raise exception if user does not exist
 
         return (user, None)  # authentication successful
 
