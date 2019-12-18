@@ -13,8 +13,8 @@ services:
     volumes:
       - psqldbdata:/var/lib/postgresql/data
     environment:
-      - POSTGRES_USER=db_user
-      - POSTGRES_PASSWORD=db_pass
+      - POSTGRES_USER=db_stampy
+      - POSTGRES_PASSWORD=db_FcRunc6BZ
     ports:
       - "5432:5432"
   django:
