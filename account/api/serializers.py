@@ -10,7 +10,9 @@ from account.models import (Account,
                             BusinessAccount,
                             Card,
                             QRCode,
-                            Offer)
+                            Offer,
+                            StampLog,
+                            AddDeleteCardLog)
 
 class RegistrationSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
@@ -165,3 +167,32 @@ class CardSerializer(serializers.Serializer):
     def create(self, validated_data):
         return Card.objects.create(**validated_data)
 
+
+
+class StampLogSerializer(serializers.Serializer):
+    card_id = serializers.CharField(required=True)
+
+    def save(self):
+        log = StampLog(card = Card.objects.get(id=self.validated_data['card_id']))
+        log.save()
+
+        return log
+
+    def create(self, validated_data):
+        return Business.objects.create(**validated_data)
+
+
+class AddDeleteCardSerializer(serializers.Serializer):
+    user_id = serializers.CharField(required=True)
+    business_id = serializers.CharField(required=True)
+    operation = serializers.BooleanField(required=True)
+
+    def save(self):
+        log = AddDeleteCardLog(user= Account.objects.get(id=self.validated_data['user_id']),
+                               business= Business.objects.get(id=self.validated_data['business_id']),
+                               operation=self.validated_data['operation'])
+        log.save()
+        return log
+
+    def create(self, validated_data):
+        return Business.objects.create(**validated_data)

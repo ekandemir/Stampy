@@ -178,6 +178,18 @@ class Offer(models.Model):
     offer_body = models.CharField(verbose_name='offer_body',max_length=1000)
 
 
+# ----- Logs ---------
+class StampLog(models.Model):
+    card = models.ForeignKey(Card, on_delete=models.CASCADE)
+    offer_date = models.DateField(verbose_name='date', default=datetime.datetime.now())
+
+
+class AddDeleteCardLog(models.Model):
+    user = models.ForeignKey(Account, on_delete=models.CASCADE)
+    business = models.ForeignKey(Business, on_delete=models.CASCADE)
+    operation = models.BooleanField(verbose_name="operation", default=True)
+
+
 @receiver(post_save, sender=(settings.AUTH_USER_MODEL or BusinessAccount))
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:

@@ -11,7 +11,9 @@ from account.api.serializers import (RegistrationSerializer,
                                      BusinessUserRegistrationSerializer,
                                      CardSerializer,
                                      QRCodeSerializer,
-                                     OfferSerializer)
+                                     OfferSerializer,
+                                     StampLogSerializer,
+                                     AddDeleteCardLog)
 from rest_framework.authtoken.models import Token
 from account.api.stamp import get_qr_code
 
@@ -330,10 +332,8 @@ def business_list_view(request):
 def get_qr_view(request):
     if not isinstance(request.user, AnonymousUser):
         try:
-            token = request.META.get("HTTP_AUTHORIZATION")[6:]
-            user = Token.objects.get(key=token).user
             data = request.data
-            data["customer_id"] = user.id
+            data["customer_id"] = request.user.id
             data["business_id"] = request.data.get("business_id")
             data["qr_code"] = get_qr_code()
 
@@ -374,6 +374,7 @@ def validate_qr_view(request):
                     cards[0].stamp_number += 1
                     cards[0].save()
                     qr_code.delete()
+                    log_serializer = StampLogSerializer({"card_id":cards[0].id})
                 return Response({"success": True,
                                  "message": "Successfully stamped.",
                                  "data": {}},
