@@ -143,7 +143,7 @@ def business_registration_view(request):
                              "message": "Business successfully added.",
                              "data": serializer.data}, status=status.HTTP_201_CREATED)
 
-        return Response({"success": True,
+        return Response({"success": False,
                          "message": "Invalid data.",
                          "data": {},
                          "error": 0000}, status=status.HTTP_400_BAD_REQUEST)
@@ -157,7 +157,6 @@ def business_registration_view(request):
 @api_view(['POST'])
 @authentication_classes([])
 def business_user_registration_view(request):
-    if not isinstance(request.user, AnonymousUser):
         if request.method == 'POST':
             serializer = BusinessUserRegistrationSerializer(data=request.data)
             data = {}
@@ -175,11 +174,6 @@ def business_user_registration_view(request):
                                  "message": "Invalid Data",
                                  "data": {},
                                  "error_code": 0000}, status=status.HTTP_400_BAD_REQUEST)
-    else:
-        return Response({"success": False,
-                         "message": "Token Not Found",
-                         "data": {}},
-                        status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['POST'])
