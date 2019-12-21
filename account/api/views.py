@@ -377,7 +377,7 @@ def validate_qr_view(request):
                     cards[0].stamp_number += 1
                     cards[0].save()
                     qr_code.delete()
-                    log_serializer = StampLogSerializer({"card_id":cards[0].id})
+                    log_serializer = StampLogSerializer(data={"card_id":cards[0].id})
                     if log_serializer.is_valid():
                         log_serializer.save()
                     return Response({"success": True,
