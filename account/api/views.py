@@ -270,7 +270,10 @@ def card_list_view(request):
             for card in cards:
                 card_data.append({"card_id": card.id,
                                   "card_image": card.business.card_image,
-                                  "business_id": card.business.id})
+                                  "business_id": card.business.id,
+                                  "business_name": card.business.name,
+                                  "stamp_number": card.stamp_number,
+                                  "stamp_total": card.stamp_total})
 
             return Response({"success": True,
                              "message": "Successfully returned.",
@@ -370,15 +373,25 @@ def validate_qr_view(request):
             qr_code = QRCode.objects.get(qr_code=request.data.get("qr_code"))
             if qr_code.business.id == business.id:
                 cards = Card.objects.filter(customer=qr_code.customer).filter(business=qr_code.business)
-                if len(cards) == 1:
+                if len(cards) == 1 and cards[0].stamp_number < cards[0].stamp_total:
                     cards[0].stamp_number += 1
                     cards[0].save()
                     qr_code.delete()
                     log_serializer = StampLogSerializer({"card_id":cards[0].id})
-                return Response({"success": True,
-                                 "message": "Successfully stamped.",
-                                 "data": {}},
-                                status=status.HTTP_200_OK)
+                    if log_serializer.is_valid():
+                        log_serializer.save()
+                    return Response({"success": True,
+                                     "message": "Successfully stamped.",
+                                     "data": {}},
+                                    status=status.HTTP_200_OK)
+                else:
+                    cards[0].stamp_number -= cards[0].stamp_total
+                    cards[0].save()
+                    qr_code.delete()
+                    return Response({"success": True,
+                                     "message": "Free coffee successfully given.",
+                                     "data": {}},
+                                    status=status.HTTP_200_OK)
             return Response({"success": False,
                              "message": "Data is invalid.",
                              "data": {},
