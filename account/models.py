@@ -161,6 +161,8 @@ class Card(models.Model):
     business = models.ForeignKey(Business, on_delete=models.CASCADE)
     stamp_number = models.IntegerField(verbose_name='stamp_number', default=0)
     stamp_total = models.IntegerField(verbose_name='stamp_total', default=9)
+    class Meta:
+        unique_together = ('customer', 'business',)
 
 
 # !----! Card User !-------
