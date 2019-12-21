@@ -178,7 +178,7 @@ class Offer(models.Model):
     offer_date = models.DateField(verbose_name='offer_date', default=datetime.date(2019, 12, 30))
     offer_expire_date = models.DateField(verbose_name='offer_expire_date', default=datetime.date(2020, 12, 30))
     offer_body = models.CharField(verbose_name='offer_body',max_length=1000)
-    offer_image = models.CharField(verbose_name='offer_body',max_length=1000)
+    offer_image = models.CharField(verbose_name='offer_body',max_length=1000, default='/image')
 
 
 # ----- Logs ---------
