@@ -529,21 +529,21 @@ def insights_view(request):
         data['total_coffee'] = len(StampLog.objects.filter(business=business))
         data['total_coffee_month'] = len(
             StampLog.objects.filter(business=business).filter(
-            date__gte=datetime.datetime.now() - datetime.timedelta(days=datetime.datetime.now().days)))
+            date__gte=datetime.datetime.now() - datetime.timedelta(days=datetime.datetime.now().day)))
         data['total_free_coffee'] = len(StampLog.objects.filter(business=business).filter(operation=False))
         data['total_free_coffee'] = len(StampLog.objects.filter(business=business).filter(operation=False).filter(
-            date__gte=datetime.datetime.now() - datetime.timedelta(days=datetime.datetime.now().days)))
+            date__gte=datetime.datetime.now() - datetime.timedelta(days=datetime.datetime.now().day)))
         data['age_distribution'] = [0, 0, 0, 0, 0]
         data['gender_distribution'] = [0, 0, 0]
-        customers = [x for x in Card.objects.all(business=business).customer]
+        customers = [x.customer for x in Card.objects.filter(business=business)]
         for customer in customers:
-            if (datetime.datetime.now() - customer.dob).year < 18:
+            if (datetime.datetime.now().year - customer.dob.year) < 18:
                 data['age_distribution'][0] += 1
-            elif (datetime.datetime.now() - customer.dob).year < 24:
+            elif (datetime.datetime.now().year - customer.dob.year) < 24:
                 data['age_distribution'][1] += 1
-            elif (datetime.datetime.now() - customer.dob).year < 35:
+            elif (datetime.datetime.now().year - customer.dob.year) < 35:
                 data['age_distribution'][2] += 1
-            elif (datetime.datetime.now() - customer.dob).year < 45:
+            elif (datetime.datetime.now().year - customer.dob.year) < 45:
                 data['age_distribution'][3] += 1
             else:
                 data['age_distribution'][4] += 1
