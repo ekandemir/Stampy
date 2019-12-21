@@ -368,7 +368,7 @@ def validate_qr_view(request):
             token = request.META.get("HTTP_AUTHORIZATION")[6:]
             business = BusinessToken.objects.get(token=token).business_user
             qr_code = QRCode.objects.get(qr_code=request.data.get("qr_code"))
-            if qr_code.business.id == business.id:
+            if qr_code.business.id == business.business.id:
                 cards = Card.objects.filter(customer=qr_code.customer).filter(business=qr_code.business)
                 if len(cards) == 1:
                     cards[0].stamp_number += 1
@@ -384,6 +384,7 @@ def validate_qr_view(request):
                              "error": 0000}, status=status.HTTP_400_BAD_REQUEST)
         except Business.DoesNotExist:
             return Response({"success": False,
+
                              "message": "Business not found.",
                              "data": {},
                              "error": 0000}, status=status.HTTP_400_BAD_REQUEST)
@@ -484,3 +485,13 @@ def offer_list_view(request):
                          "message": "Token Not Found",
                          "data": {}},
                          status=status.HTTP_401_UNAUTHORIZED)
+
+
+
+
+
+
+
+
+
+
