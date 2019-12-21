@@ -528,7 +528,8 @@ def insights_view(request):
         data = {}
         data['total_coffee'] = len(StampLog.objects.filter(business=business))
         data['total_coffee_month'] = len(
-            StampLog.objects.filter(business=business).filter(date__gte=datetime.datetime.now()[7:]))
+            StampLog.objects.filter(business=business).filter(
+            date__gte=datetime.datetime.now() - datetime.timedelta(days=datetime.datetime.now().days)))
         data['total_free_coffee'] = len(StampLog.objects.filter(business=business).filter(operation=False))
         data['total_free_coffee'] = len(StampLog.objects.filter(business=business).filter(operation=False).filter(
             date__gte=datetime.datetime.now() - datetime.timedelta(days=datetime.datetime.now().days)))
