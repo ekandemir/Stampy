@@ -171,9 +171,10 @@ class CardSerializer(serializers.Serializer):
 
 class StampLogSerializer(serializers.Serializer):
     card_id = serializers.CharField(required=True)
-
+    operation = serializers.BooleanField(required=True)
     def save(self):
-        log = StampLog(card = Card.objects.get(id=self.validated_data['card_id']))
+        log = StampLog(card = Card.objects.get(id=self.validated_data['card_id']),
+                       operation=self.validated_data['operation'])
         log.save()
 
         return log

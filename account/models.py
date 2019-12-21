@@ -181,13 +181,15 @@ class Offer(models.Model):
 # ----- Logs ---------
 class StampLog(models.Model):
     card = models.ForeignKey(Card, on_delete=models.CASCADE)
-    offer_date = models.DateField(verbose_name='date', default=datetime.datetime.now())
+    operation = models.BooleanField(verbose_name='operation', default=True) # 1 for stamp 0 for free coffee
+    date = models.DateTimeField(verbose_name='date', default=datetime.datetime.now())
 
 
 class AddDeleteCardLog(models.Model):
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
     business = models.ForeignKey(Business, on_delete=models.CASCADE)
     operation = models.BooleanField(verbose_name="operation", default=True)
+    date = models.DateTimeField(verbose_name='date', default=datetime.datetime.now())
 
 
 @receiver(post_save, sender=(settings.AUTH_USER_MODEL or BusinessAccount))

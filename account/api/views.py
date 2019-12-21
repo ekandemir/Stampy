@@ -13,7 +13,7 @@ from account.api.serializers import (RegistrationSerializer,
                                      QRCodeSerializer,
                                      OfferSerializer,
                                      StampLogSerializer,
-                                     AddDeleteCardLog)
+                                     AddDeleteCardSerializer)
 from rest_framework.authtoken.models import Token
 from account.api.stamp import get_qr_code
 
@@ -212,6 +212,11 @@ def card_add_view(request):
         serializer = CardSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
+            log_serializer = AddDeleteCardSerializer(data={"user_id":request.user.id,
+                                                           "business_id":request.data.get("business_id"),
+                                                           "operation":True})
+            if log_serializer.is_valid():
+                log_serializer.save()
             return Response({"success": True,
                              "message": "Business User has been created",
                              "data": serializer.data}, status=status.HTTP_200_OK)
@@ -237,6 +242,11 @@ def card_delete_view(request):
             card = Card.objects.get(customer=Token.objects.get(key=token).user,
                                     business=Business.objects.get(id=request.data.get("business_id")))
             card.delete()
+            log_serializer = AddDeleteCardSerializer(data={"user_id":request.user.id,
+                                                           "business_id":request.data.get("business_id"),
+                                                           "operation":False})
+            if log_serializer.is_valid():
+                log_serializer.save()
 
             return Response({"success": True,
                              "message": "Successfully deleted.",
@@ -377,7 +387,8 @@ def validate_qr_view(request):
                     cards[0].stamp_number += 1
                     cards[0].save()
                     qr_code.delete()
-                    log_serializer = StampLogSerializer(data={"card_id":cards[0].id})
+                    log_serializer = StampLogSerializer(data={"card_id":cards[0].id,
+                                                              "operation":True})
                     if log_serializer.is_valid():
                         log_serializer.save()
                     return Response({"success": True,
@@ -388,6 +399,10 @@ def validate_qr_view(request):
                     cards[0].stamp_number -= cards[0].stamp_total
                     cards[0].save()
                     qr_code.delete()
+                    log_serializer = StampLogSerializer(data={"card_id":cards[0].id,
+                                                              "operation":False})
+                    if log_serializer.is_valid():
+                        log_serializer.save()
                     return Response({"success": True,
                                      "message": "Free coffee successfully given.",
                                      "data": {}},
