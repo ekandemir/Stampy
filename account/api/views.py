@@ -373,13 +373,19 @@ def validate_qr_view(request):
                 if len(cards) == 1:
                     cards[0].stamp_number += 1
                     cards[0].save()
-
+                    qr_code.delete()
                 return Response({"success": True,
                                  "message": "Successfully stamped.",
                                  "data": {}},
                                 status=status.HTTP_200_OK)
             return Response({"success": False,
                              "message": "Data is invalid.",
+                             "data": {},
+                             "error": 0000}, status=status.HTTP_400_BAD_REQUEST)
+        except QRCode.DoesNotExist:
+            return Response({"success": False,
+
+                             "message": "QRCode is invalid.",
                              "data": {},
                              "error": 0000}, status=status.HTTP_400_BAD_REQUEST)
         except Business.DoesNotExist:
