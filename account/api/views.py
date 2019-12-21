@@ -29,7 +29,11 @@ from account.models import (Account,
                             BusinessAccount,
                             Card,
                             QRCode,
-                            Offer)
+                            Offer,
+                            StampLog,
+                            AddDeleteCardLog)
+
+import datetime
 
 
 @api_view(['POST'])
@@ -212,9 +216,9 @@ def card_add_view(request):
         serializer = CardSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
-            log_serializer = AddDeleteCardSerializer(data={"user_id":request.user.id,
-                                                           "business_id":request.data.get("business_id"),
-                                                           "operation":True})
+            log_serializer = AddDeleteCardSerializer(data={"user_id": request.user.id,
+                                                           "business_id": request.data.get("business_id"),
+                                                           "operation": True})
             if log_serializer.is_valid():
                 log_serializer.save()
             return Response({"success": True,
@@ -242,9 +246,9 @@ def card_delete_view(request):
             card = Card.objects.get(customer=Token.objects.get(key=token).user,
                                     business=Business.objects.get(id=request.data.get("business_id")))
             card.delete()
-            log_serializer = AddDeleteCardSerializer(data={"user_id":request.user.id,
-                                                           "business_id":request.data.get("business_id"),
-                                                           "operation":False})
+            log_serializer = AddDeleteCardSerializer(data={"user_id": request.user.id,
+                                                           "business_id": request.data.get("business_id"),
+                                                           "operation": False})
             if log_serializer.is_valid():
                 log_serializer.save()
 
@@ -338,7 +342,7 @@ def business_list_view(request):
         return Response({"success": False,
                          "message": "Token Not Found",
                          "data": {}},
-                         status=status.HTTP_401_UNAUTHORIZED)
+                        status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['POST'])
@@ -387,8 +391,8 @@ def validate_qr_view(request):
                     cards[0].stamp_number += 1
                     cards[0].save()
                     qr_code.delete()
-                    log_serializer = StampLogSerializer(data={"card_id":cards[0].id,
-                                                              "operation":True})
+                    log_serializer = StampLogSerializer(data={"card_id": cards[0].id,
+                                                              "operation": True})
                     if log_serializer.is_valid():
                         log_serializer.save()
                     return Response({"success": True,
@@ -399,8 +403,8 @@ def validate_qr_view(request):
                     cards[0].stamp_number -= cards[0].stamp_total
                     cards[0].save()
                     qr_code.delete()
-                    log_serializer = StampLogSerializer(data={"card_id":cards[0].id,
-                                                              "operation":False})
+                    log_serializer = StampLogSerializer(data={"card_id": cards[0].id,
+                                                              "operation": False})
                     if log_serializer.is_valid():
                         log_serializer.save()
                     return Response({"success": True,
@@ -432,7 +436,7 @@ def validate_qr_view(request):
         return Response({"success": False,
                          "message": "Token Not Found",
                          "data": {}},
-                         status=status.HTTP_401_UNAUTHORIZED)
+                        status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['POST'])
@@ -463,7 +467,7 @@ def business_list_location(request):
         return Response({"success": False,
                          "message": "Token Not Found",
                          "data": {}},
-                         status=status.HTTP_401_UNAUTHORIZED)
+                        status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['POST'])
@@ -489,7 +493,7 @@ def offer_add_view(request):
         return Response({"success": False,
                          "message": "Token Not Found",
                          "data": {}},
-                         status=status.HTTP_401_UNAUTHORIZED)
+                        status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['GET'])
@@ -519,14 +523,49 @@ def offer_list_view(request):
         return Response({"success": False,
                          "message": "Token Not Found",
                          "data": {}},
-                         status=status.HTTP_401_UNAUTHORIZED)
+                        status=status.HTTP_401_UNAUTHORIZED)
 
 
+@api_view(['GET'])
+@authentication_classes([BusinessAdminAuthentication])
+def insights_view(request):
+    if not isinstance(request.user, AnonymousUser):
+        business = request.user.business
+        data = {}
+        data['total_coffee'] = len(StampLog.objects.filter(business=business))
+        data['total_coffee_month'] = len(
+            StampLog.objects.filter(business=business).filter(date__gte=datetime.datetime.now()[7:]))
+        data['total_free_coffee'] = len(StampLog.objects.filter(business=business).filter(operation=False))
+        data['total_free_coffee'] = len(StampLog.objects.filter(business=business).filter(operation=False).filter(
+            date__gte=datetime.datetime.now() - datetime.timedelta(days=datetime.datetime.now().days)))
+        data['age_distribution'] = [0, 0, 0, 0, 0]
+        data['gender_distribution'] = [0, 0, 0]
+        customers = [x for x in Card.objects.all(business=business).customer]
+        for customer in customers:
+            if (datetime.datetime.now() - customer.dob).year < 18:
+                data['age_distribution'][0] += 1
+            elif (datetime.datetime.now() - customer.dob).year < 24:
+                data['age_distribution'][1] += 1
+            elif (datetime.datetime.now() - customer.dob).year < 35:
+                data['age_distribution'][2] += 1
+            elif (datetime.datetime.now() - customer.dob).year < 45:
+                data['age_distribution'][3] += 1
+            else:
+                data['age_distribution'][4] += 1
 
+            if customer.gender == 'F':
+                data['gender_distribution'][0] += 1
+            elif customer.gender == 'M':
+                data['gender_distribution'][1] += 1
+            else:
+                data['gender_distribution'][2] += 1
 
-
-
-
-
-
-
+        return Response({"success": True,
+                         "message": "Insights returned.",
+                         "data": data},
+                        status=status.HTTP_200_OK)
+    else:
+        return Response({"success": False,
+                         "message": "Token Not Found",
+                         "data": {}},
+                        status=status.HTTP_401_UNAUTHORIZED)

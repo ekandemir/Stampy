@@ -178,11 +178,14 @@ class Offer(models.Model):
     offer_date = models.DateField(verbose_name='offer_date', default=datetime.date(2019, 12, 30))
     offer_expire_date = models.DateField(verbose_name='offer_expire_date', default=datetime.date(2020, 12, 30))
     offer_body = models.CharField(verbose_name='offer_body',max_length=1000)
+    offer_image = models.CharField(verbose_name='offer_body',max_length=1000)
 
 
 # ----- Logs ---------
 class StampLog(models.Model):
     card = models.ForeignKey(Card, on_delete=models.CASCADE)
+    customer = models.ForeignKey(Account, on_delete=models.CASCADE)
+    business = models.ForeignKey(Business, on_delete=models.CASCADE)
     operation = models.BooleanField(verbose_name='operation', default=True) # 1 for stamp 0 for free coffee
     date = models.DateTimeField(verbose_name='date', default=datetime.datetime.now())
 

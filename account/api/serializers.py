@@ -133,12 +133,13 @@ class OfferSerializer(serializers.Serializer):
     offer_date = serializers.DateField(required=True)
     offer_expire_date = serializers.DateField(required=True)
     offer_body = serializers.CharField(allow_blank=False,max_length=1000)
-
+    offer_image = serializers.CharField(allow_blank=False,max_length=1000)
     def save(self):
         offer = Offer(business_id=self.validated_data['business_id'],
                       offer_date=self.validated_data['offer_date'],
                       offer_expire_date=self.validated_data['offer_expire_date'],
-                      offer_body=self.validated_data['offer_body'])
+                      offer_body=self.validated_data['offer_body'],
+                      offer_image=self.validated_data['offer_image'])
 
         offer.save()
         return offer
@@ -173,7 +174,10 @@ class StampLogSerializer(serializers.Serializer):
     card_id = serializers.CharField(required=True)
     operation = serializers.BooleanField(required=True)
     def save(self):
-        log = StampLog(card = Card.objects.get(id=self.validated_data['card_id']),
+        card = Card.objects.get(id=self.validated_data['card_id'])
+        log = StampLog(card = card,
+                       customer = card.customer,
+                       business = card.business,
                        operation=self.validated_data['operation'])
         log.save()
 

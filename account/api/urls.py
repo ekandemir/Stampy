@@ -16,7 +16,8 @@ from account.api.views import (
     business_list_location,
     offer_add_view,
     offer_list_view,
-    get_user)
+    get_user,
+    insights_view)
 
 from rest_framework.authtoken.views import obtain_auth_token
 
@@ -46,6 +47,8 @@ urlpatterns = [
 
     path('offer-add', offer_add_view, name='offer_add_view'),
     path('offer-list', offer_list_view, name='offer_list_view'),
+
+    path('insights', insights_view, name='insights')
 
 
 
