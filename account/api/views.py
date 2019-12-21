@@ -366,9 +366,9 @@ def validate_qr_view(request):
     if not isinstance(request.user, AnonymousUser):
         try:
             token = request.META.get("HTTP_AUTHORIZATION")[6:]
-            business = BusinessToken.objects.get(token=token).business_user
+            business = BusinessToken.objects.get(token=token)
             qr_code = QRCode.objects.get(qr_code=request.data.get("qr_code"))
-            if qr_code.business.id == business.business.id:
+            if qr_code.business.id == business.id:
                 cards = Card.objects.filter(customer=qr_code.customer).filter(business=qr_code.business)
                 if len(cards) == 1:
                     cards[0].stamp_number += 1
