@@ -155,7 +155,7 @@ def business_registration_view(request):
 
 
 @api_view(['POST'])
-@authentication_classes([BusinessAdminAuthentication])
+@authentication_classes([])
 def business_user_registration_view(request):
     if not isinstance(request.user, AnonymousUser):
         if request.method == 'POST':
