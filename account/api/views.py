@@ -554,7 +554,7 @@ def insights_view(request):
                 data['gender_distribution'][1] += 1
             else:
                 data['gender_distribution'][2] += 1
-
+        data['monthly_sell'] = [1265, 1318, 1441, 1399, 1400, 1500, 1670, 1272, 1817, 1598, 1218, data['total_coffee_month']]
         return Response({"success": True,
                          "message": "Insights returned.",
                          "data": data},
