@@ -42,7 +42,7 @@ urlpatterns = [
 
 
     path('get-qr', get_qr_view, name='get_qr_view'),
-    path('validate-qr', validate_qr_view, name='validate_qr_view'),
+    path('validate-qr', validate_qr_view, name='get_qr_view'),
 
 
     path('offer-add', offer_add_view, name='offer_add_view'),
