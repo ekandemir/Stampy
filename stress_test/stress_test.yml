@@ -1,0 +1,12 @@
+config:
+  target: 'http://167.71.11.118:8000'
+  phases:
+    - duration: 120
+      arrivalRate: 30
+  defaults:
+    headers:
+      Authorization: 'Token 9195c2e3edb2cc4201dc08800c15730644e00fa6'
+scenarios:
+  - flow:
+    - get:
+        url: "/api/get-user"
