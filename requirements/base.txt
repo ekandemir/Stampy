@@ -1,5 +1,5 @@
 # Django updated Nov 2017
-django==2.1.1
+django==2.2.13
 
 # Configuration
 django-environ==0.4.0
